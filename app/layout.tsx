@@ -18,7 +18,7 @@ export default function RootLayout({
    return (
       <html lang="en">
          <body className={inter.className}>
-            <Chatbot direction="bottom-right" />
+            <Chatbot direction="bottom-left" />
          </body>
       </html>
    );
