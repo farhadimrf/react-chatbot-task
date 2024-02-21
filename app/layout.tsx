@@ -16,7 +16,7 @@ export default function RootLayout({
    children: React.ReactNode;
 }>) {
    return (
-      <html lang="en">
+      <html lang="en" className={inter.className}>
          <body className={inter.className}>
             <Chatbot direction="bottom-left" />
          </body>

@@ -1,15 +1,19 @@
 "use client";
 import { ChevronDown, MessageSquareText, SendHorizontal, UserRound, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import ChatbotHeader from "./ChatbotHeader";
+import TextBubble from "./TextBubble";
+import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
+import useRandomBotMessage from "@/utils/random-bot-message";
 
 type ChatbotProps = {
    direction: "bottom-right" | "bottom-left";
 };
-type ChatMessage = {
+export interface ChatMessage {
    type: "user" | "bot";
    text: string;
-};
+}
 
 type FormData = {
    message: string;
@@ -22,35 +26,27 @@ const Chatbot = ({ direction }: ChatbotProps) => {
    const chatHeight = isOpen ? "h-[75vh] sm:max-h-[650px]" : "h-0";
 
    const { register, handleSubmit, setValue } = useForm<FormData>();
-   console.log("iam renderefe");
-   const generateRandomBotResponse = () => {
-      const responses = [
-         "I'm here to help!",
-         "How can I assist you today?",
-         "Ask me anything!",
-         "Let me know what you need.",
-      ];
-      const randomIndex = Math.floor(Math.random() * responses.length);
-      return responses[randomIndex];
-   };
+
+   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+   useScrollToBottom(chatContainerRef, [chatMessages]);
+
+   const { generateMessage } = useRandomBotMessage();
+
    useEffect(() => {
-      const botMessage = generateRandomBotResponse();
-      setChatMessages([{ type: "bot", text: "Hi, How can i help you?" }]);
+      setChatMessages([{ type: "bot", text: "Hi Welcome to the chatbot, How can i help you?" }]);
    }, []);
 
-   const onSubmit: SubmitHandler<FormData> = (data) => {
+   const onSubmit: SubmitHandler<FormData> = async (data) => {
       const userMessage = data.message.trim();
 
       if (userMessage !== "") {
-         const botMessage = generateRandomBotResponse();
-
-         setChatMessages((prevMessages) => [
-            ...prevMessages,
-            { type: "user", text: userMessage },
-            { type: "bot", text: botMessage },
-         ]);
-
+         setChatMessages((prevMessages) => [...prevMessages, { type: "user", text: userMessage }]);
          setValue("message", "");
+
+         setTimeout(() => {
+            const botMessage = generateMessage();
+            setChatMessages((prevMessages) => [...prevMessages, { type: "bot", text: botMessage }]);
+         }, 600);
       }
    };
 
@@ -62,45 +58,24 @@ const Chatbot = ({ direction }: ChatbotProps) => {
                className="m-1 border rounded-full p-3 bg-[#006ffd] text-white flex items-center justify-center "
             >
                {!isOpen ? (
-                  <MessageSquareText className="h-8 w-8" />
+                  <MessageSquareText className="h-7 w-7 cursor-pointer" />
                ) : (
-                  <ChevronDown className="h-8 w-8" />
+                  <ChevronDown className="h-7 w-7 cursor-pointer" />
                )}
             </div>
          </div>
          {isOpen && (
             <div
-               className={`absolute flex flex-col items-center justify-between shadow-lg border rounded-b-lg rounded-t-2xl w-[98%] sm:w-[350px] ${chatPosition} bottom-[66px] bg-white ${chatHeight}`}
+               className={`absolute flex flex-col items-center justify-between shadow-lg border rounded-b-lg rounded-t-2xl w-[98%] sm:w-[350px] ${chatPosition} bottom-[70px] bg-white ${chatHeight}`}
             >
-               <div className="flex justify-between items-center rounded-t-2xl w-full p-4 bg-[#006ffd]">
-                  <div className="flex items-center gap-2">
-                     <div className="bg-white p-2 rounded-full">
-                        <UserRound className="h-7 w-7 text-[#006ffd]" />
-                     </div>
-                     <div className="flex flex-col text-white items-start">
-                        <h3 className="text-base">Bot</h3>
-                        <p className="text-sm">Your support</p>
-                     </div>
-                  </div>
+               <ChatbotHeader isOpen={isOpen} setIsOpen={setIsOpen} />
 
-                  <X
-                     className="text-white cursor-pointer h-5 w-5"
-                     onClick={() => setIsOpen(!isOpen)}
-                  />
-               </div>
-
-               <div className="h-full w-full flex flex-col text-sm px-1 pt-2 overflow-auto">
+               <div
+                  ref={chatContainerRef}
+                  className="h-full w-full flex flex-col text-sm px-1 pt-2 overflow-auto"
+               >
                   {chatMessages.map((message, index) => (
-                     <div
-                        key={index}
-                        className={`bg-${
-                           message.type === "bot"
-                              ? "white text-black self-start"
-                              : "[#006ffd] text-white self-end"
-                        } p-2 m-2 rounded-3xl px-3 border max-w-[70%]`}
-                     >
-                        {message.text}
-                     </div>
+                     <TextBubble key={index} message={message} />
                   ))}
                </div>
 
@@ -113,10 +88,10 @@ const Chatbot = ({ direction }: ChatbotProps) => {
                         {...register("message")}
                         type="text"
                         placeholder="Type your message..."
-                        className="w-full bg-transparent focus:outline-none placeholder:text-sm placeholder:ps-1"
+                        className="w-full ps-1  text-sm focus:outline-none placeholder:text-sm"
                      />
                   </div>
-                  <button type="submit" className="rounded-full p-2 rotate-180 bg-[#006ffd]">
+                  <button type="submit" className="rounded-full p-2  bg-[#006ffd]">
                      <SendHorizontal className="h-5 w-5 text-white" />
                   </button>
                </form>
