@@ -20,7 +20,7 @@ type FormData = {
 };
 
 const Chatbot = ({ direction }: ChatbotProps) => {
-   const [isOpen, setIsOpen] = useState(true);
+   const [isOpen, setIsOpen] = useState(false);
    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
    const chatPosition = direction === "bottom-right" ? "right-1 sm:right-3" : "left-1 sm:left-3";
    const chatHeight = isOpen ? "h-[75vh] sm:max-h-[650px]" : "h-0";
@@ -52,21 +52,21 @@ const Chatbot = ({ direction }: ChatbotProps) => {
 
    return (
       <>
-         <div className={`fixed ${chatPosition} bottom-1`}>
+         <div className={`fixed ${chatPosition} bottom-1 z-[998]`}>
             <div
                onClick={() => setIsOpen(!isOpen)}
                className="m-1 border rounded-full p-3 bg-[#006ffd] text-white flex items-center justify-center "
             >
                {!isOpen ? (
-                  <MessageSquareText className="h-7 w-7 cursor-pointer" />
+                  <MessageSquareText aria-label="open chatbot" className="h-7 w-7 cursor-pointer" />
                ) : (
-                  <ChevronDown className="h-7 w-7 cursor-pointer" />
+                  <ChevronDown aria-label="close chatbot" className="h-7 w-7 cursor-pointer" />
                )}
             </div>
          </div>
          {isOpen && (
             <div
-               className={`absolute flex flex-col items-center justify-between shadow-lg border rounded-b-lg rounded-t-2xl w-[98%] sm:w-[350px] ${chatPosition} bottom-[70px] bg-white ${chatHeight}`}
+               className={`absolute flex flex-col items-center justify-between shadow-lg border rounded-b-lg rounded-t-2xl w-[98%] sm:w-[350px] z-[998] ${chatPosition} bottom-[70px] bg-white ${chatHeight}`}
             >
                <ChatbotHeader isOpen={isOpen} setIsOpen={setIsOpen} />
 
@@ -83,15 +83,20 @@ const Chatbot = ({ direction }: ChatbotProps) => {
                   onSubmit={handleSubmit(onSubmit)}
                   className="flex pb-2 px-2 items-center w-full gap-1"
                >
-                  <div className="border flex-1 rounded-3xl p-1.5 ">
+                  <div className="border flex-1 rounded-3xl p-1.5">
                      <input
+                        aria-label="chat input"
                         {...register("message")}
                         type="text"
                         placeholder="Type your message..."
                         className="w-full ps-1  text-sm focus:outline-none placeholder:text-sm"
                      />
                   </div>
-                  <button type="submit" className="rounded-full p-2  bg-[#006ffd]">
+                  <button
+                     aria-label="send chat"
+                     type="submit"
+                     className="rounded-full p-2  bg-[#006ffd]"
+                  >
                      <SendHorizontal className="h-5 w-5 text-white" />
                   </button>
                </form>
