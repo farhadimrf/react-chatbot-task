@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import ChatbotHeader from "./ChatbotHeader";
 import TextBubble from "./TextBubble";
-import useScrollToBottom from "@/hooks/use-scroll-to-bottom";
-import useRandomBotMessage from "@/utils/random-bot-message";
+import useScrollToBottom from "../hooks/use-scroll-to-bottom";
+import useRandomBotMessage from "../utils/random-bot-message";
 
 type ChatbotProps = {
    direction: "bottom-right" | "bottom-left";
